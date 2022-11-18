@@ -6,6 +6,6 @@ pub enum Instruction {
     Right,
     Out,
     In,
-    LoopStart,
+    LoopStart(usize),
     LoopEnd(usize)
 }

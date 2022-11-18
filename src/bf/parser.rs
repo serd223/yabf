@@ -24,11 +24,15 @@ impl Parser {
                 ',' => Instruction::In,
                 '[' => {
                     self.loop_starts.push(program.len());
-                    Instruction::LoopStart
+                    Instruction::LoopStart(0)
                 }
-                ']' => Instruction::LoopEnd(self.loop_starts.pop().expect(
-                    format!("Unexpected \']\' @{}", i).as_str()
-                )),
+                ']' => {
+                    let start = self.loop_starts.pop().expect(
+                        format!("Unexpected \']\' @char{}", i).as_str()
+                    );
+                    program[start] = Instruction::LoopStart(program.len()); 
+                    Instruction::LoopEnd(start)
+                },
                 _ => continue
             };
             program.push(inst);

@@ -69,7 +69,9 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
             Instruction::LoopEnd(l) => if self.mem[self.mem_ptr] > 0 {
                 self.program_counter = l;
             },
-            _ => ()
+            Instruction::LoopStart(l) => if self.mem[self.mem_ptr] <= 0 {
+                self.program_counter = l;
+            }
         };
         self.program_counter += 1;
         if self.program_counter >= self.program_len {
