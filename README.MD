@@ -1,5 +1,4 @@
-### Yet Another Bf Interpreter
-
+# Yet Another Bf Interpreter
 
 
 ## Compiling and Running
