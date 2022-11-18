@@ -34,3 +34,11 @@ pub const HELLO_WORLD: &str = "
     32 >>+.                    Add 1 to Cell #5 gives us an exclamation point
     33 >++.                    And finally a newline from Cell #6
 ";
+
+use yabf::*;
+fn main() {
+    let program = Program::from(HELLO_WORLD);
+    let mut bf: BfInstance<256> = BfInstance::from(program);
+    
+    bf.run();
+}

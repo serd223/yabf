@@ -1,11 +1,11 @@
-pub mod instructions;
+mod instructions;
 pub use instructions::*;
 
-pub mod interpreter;
+mod interpreter;
 pub use interpreter::*;
 
 mod parser;
 use parser::*;
 
-pub mod program;
+mod program;
 pub use program::*;
