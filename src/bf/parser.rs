@@ -33,8 +33,9 @@ impl Parser {
             };
             program.push(inst);
         }
-        if self.loop_starts.len() > 0 {
-            panic!("\'[\' with no matching \']\'")
+        match self.loop_starts.pop() {
+            Some(i) => panic!("\'[\' with no matching \']\' @{i}"),
+            None => ()
         }
         program
     }
