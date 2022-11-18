@@ -4,5 +4,8 @@ pub use instructions::*;
 pub mod interpreter;
 pub use interpreter::*;
 
-pub mod parser;
-pub use parser::*;
+mod parser;
+use parser::*;
+
+pub mod program;
+pub use program::*;

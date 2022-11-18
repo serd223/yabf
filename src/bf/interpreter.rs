@@ -1,15 +1,13 @@
 use std::io::Write;
 
-use crate::bf::Instruction;
+use super::{Instruction, Program, ProgramStatus};
 
 pub struct BfInstance<const MEMSIZE: usize> {
 
     mem_ptr: usize,
     mem: [u8; MEMSIZE],
 
-    program_counter: usize,
-    program: Vec<Instruction>,
-    program_len: usize
+    program: Program
 }
 
 impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
@@ -17,26 +15,23 @@ impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
         Self {
             mem_ptr: 0,
             mem: [0; MEMSIZE],
-            program_counter: 0,
-            program: vec![],
-            program_len: 0
+            program: Program::default()
         }
     }
 }
 
-impl<const MEMSIZE: usize> From<Vec<Instruction>> for BfInstance<MEMSIZE> {
-    fn from(v: Vec<Instruction>) -> Self {
+impl<const MEMSIZE: usize> From<Program> for BfInstance<MEMSIZE> {
+    fn from(p: Program) -> Self {
         Self {
-            program_len: v.len(),
-            program: v,
+            program: p,
             ..Default::default()
         }
     }
 }
 
 impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
-    pub fn step(&mut self) -> bool {
-        match self.program[self.program_counter] {
+    pub fn step(&mut self) -> ProgramStatus {
+        match self.program.current() {
             Instruction::Add => self.mem[self.mem_ptr] += 1,
             Instruction::Sub => self.mem[self.mem_ptr] -= 1,
             Instruction::Right => {
@@ -55,32 +50,33 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
             Instruction::Out => {
                 print!("{}", self.mem[self.mem_ptr] as char);
                 std::io::stdout().flush().expect(
-                    format!("Couldn't flush stdout @{}", self.program_counter).as_str()
+                    format!("Couldn't flush stdout @{}", self.program.counter).as_str()
                 );
             },
             Instruction::In => {
                 let mut s = String::new();
                 std::io::stdin().read_line(&mut s).expect(
-                    format!("Couldn't read user input @{}", self.program_counter).as_str()
+                    format!("Couldn't read user input @{}", self.program.counter).as_str()
                 );
                 let c = s.chars().nth(0).unwrap();
                 self.mem[self.mem_ptr] = c as u8;
             },
             Instruction::LoopEnd(l) => if self.mem[self.mem_ptr] > 0 {
-                self.program_counter = l;
+                self.program.counter = *l;
             },
             Instruction::LoopStart(l) => if self.mem[self.mem_ptr] <= 0 {
-                self.program_counter = l;
+                self.program.counter = *l;
             }
         };
-        self.program_counter += 1;
-        if self.program_counter >= self.program_len {
-            return false;
-        }
-        true
+        self.program.step()
     }
 
     pub fn run(&mut self) {
-        while self.step() {}
+        loop {
+            match self.step() {
+                ProgramStatus::Exit => break,
+                _ => ()
+            }
+        }
     }
 }
