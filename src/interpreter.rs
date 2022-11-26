@@ -2,12 +2,13 @@ use std::io::Write;
 
 use super::{Instruction, Program, ProgramStatus};
 
+/// A structure that executes the program.
 pub struct BfInstance<const MEMSIZE: usize> {
 
     mem_ptr: usize,
     mem: [u8; MEMSIZE],
 
-    program: Program
+    pub program: Program
 }
 
 impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {

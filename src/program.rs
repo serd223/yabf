@@ -5,6 +5,7 @@ pub enum ProgramStatus {
     Exit
 }
 
+/// A structure that contains the logic of the program.
 pub struct Program {
     instructions: Vec<Instruction>,
     pub counter: usize,

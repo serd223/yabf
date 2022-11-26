@@ -1,3 +1,5 @@
+pub mod io;
+
 mod instructions;
 pub use instructions::*;
 
