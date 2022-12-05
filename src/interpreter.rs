@@ -1,13 +1,14 @@
 use std::io::Write;
 
-use super::{Instruction, Program, ProgramStatus};
+use super::{Instruction, Program, ProgramStatus, io::BfIO};
 
 /// A structure that executes the program.
 pub struct BfInstance<const MEMSIZE: usize> {
 
-    mem_ptr: usize,
-    mem: [u8; MEMSIZE],
-
+    pub mem_ptr: usize,
+    pub mem: [u8; MEMSIZE],
+    pub io_buf: BfIO,
+    
     pub program: Program
 }
 
@@ -16,7 +17,8 @@ impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
         Self {
             mem_ptr: 0,
             mem: [0; MEMSIZE],
-            program: Program::default()
+            program: Program::default(),
+            io_buf: BfIO::default()
         }
     }
 }
@@ -49,18 +51,18 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 }
             },
             Instruction::Out => {
-                print!("{}", self.mem[self.mem_ptr] as char);
-                std::io::stdout().flush().expect(
-                    format!("Couldn't flush stdout @{}", self.program.counter).as_str()
-                );
+                self.io_buf.write_out(self.mem[self.mem_ptr] as char);
             },
             Instruction::In => {
+                /*
                 let mut s = String::new();
                 std::io::stdin().read_line(&mut s).expect(
                     format!("Couldn't read user input @{}", self.program.counter).as_str()
                 );
                 let c = s.chars().nth(0).unwrap();
                 self.mem[self.mem_ptr] = c as u8;
+                */
+                self.mem[self.mem_ptr] = self.io_buf.read_in() as u8;
             },
             Instruction::LoopEnd(l) => if self.mem[self.mem_ptr] > 0 {
                 self.program.counter = *l;
@@ -79,5 +81,10 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 _ => ()
             }
         }
+
+        while let Some(c) = self.io_buf.pop_out() {
+            print!("{c}")
+        }
+        std::io::stdout().flush().expect("Couldn't flush stdout.");
     }
 }
