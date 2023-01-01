@@ -1,15 +1,15 @@
-use super::{Instruction, parse};
+use super::{parse, Instruction};
 
 pub enum ProgramStatus {
     Run,
-    Exit
+    Exit,
 }
 
 /// A structure that contains the logic of the program.
 pub struct Program {
     instructions: Vec<Instruction>,
     pub counter: usize,
-    len: usize
+    len: usize,
 }
 
 impl Default for Program {
@@ -17,7 +17,7 @@ impl Default for Program {
         Self {
             instructions: vec![],
             counter: 0,
-            len: 0
+            len: 0,
         }
     }
 }
@@ -41,7 +41,7 @@ impl<T: AsRef<str>> From<T> for Program {
         Self {
             len: iv.len(),
             instructions: iv,
-            counter: 0
+            counter: 0,
         }
     }
 }

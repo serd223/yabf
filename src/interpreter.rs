@@ -1,15 +1,14 @@
 use std::io::Write;
 
-use super::{Instruction, Program, ProgramStatus, io::BfIO};
+use super::{io::BfIO, Instruction, Program, ProgramStatus};
 
 /// A structure that executes the program.
 pub struct BfInstance<const MEMSIZE: usize> {
-
     pub mem_ptr: usize,
     pub mem: [u8; MEMSIZE],
     pub io_buf: BfIO,
-    
-    pub program: Program
+
+    pub program: Program,
 }
 
 impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
@@ -18,7 +17,7 @@ impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
             mem_ptr: 0,
             mem: [0; MEMSIZE],
             program: Program::default(),
-            io_buf: BfIO::default()
+            io_buf: BfIO::default(),
         }
     }
 }
@@ -42,17 +41,17 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 if self.mem_ptr >= MEMSIZE {
                     self.mem_ptr = 0;
                 }
-            },
+            }
             Instruction::Left => {
                 if self.mem_ptr <= 0 {
                     self.mem_ptr = MEMSIZE - 1;
                 } else {
                     self.mem_ptr -= 1;
                 }
-            },
+            }
             Instruction::Out => {
                 self.io_buf.write_out(self.mem[self.mem_ptr] as char);
-            },
+            }
             Instruction::In => {
                 /*
                 let mut s = String::new();
@@ -63,12 +62,16 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 self.mem[self.mem_ptr] = c as u8;
                 */
                 self.mem[self.mem_ptr] = self.io_buf.read_in() as u8;
-            },
-            Instruction::LoopEnd(l) => if self.mem[self.mem_ptr] > 0 {
-                self.program.counter = *l;
-            },
-            Instruction::LoopStart(l) => if self.mem[self.mem_ptr] <= 0 {
-                self.program.counter = *l;
+            }
+            Instruction::LoopEnd(l) => {
+                if self.mem[self.mem_ptr] > 0 {
+                    self.program.counter = *l;
+                }
+            }
+            Instruction::LoopStart(l) => {
+                if self.mem[self.mem_ptr] <= 0 {
+                    self.program.counter = *l;
+                }
             }
         };
         self.program.step()
@@ -78,7 +81,7 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
         loop {
             match self.step() {
                 ProgramStatus::Exit => break,
-                _ => ()
+                _ => (),
             }
         }
 

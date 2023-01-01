@@ -1,8 +1,8 @@
 /// A structure for organizing a BfInstance's IO operations.
 pub struct BfIO {
-    out_buf: Vec<char>,
+    pub out_buf: Vec<char>,
     in_buf: Vec<char>,
-    in_source: fn() -> char
+    in_source: fn() -> char,
 }
 
 impl Default for BfIO {
@@ -12,16 +12,17 @@ impl Default for BfIO {
             in_buf: vec![],
             in_source: || {
                 let mut s = String::new();
-                std::io::stdin().read_line(&mut s).expect("Couldn't read user input.");
+                std::io::stdin()
+                    .read_line(&mut s)
+                    .expect("Couldn't read user input.");
                 let c: char = s.chars().nth(0).unwrap();
                 c
-            }
+            },
         }
     }
 }
 
 impl BfIO {
-
     pub fn getc(&mut self) {
         self.in_buf.insert(0, (self.in_source)());
     }
