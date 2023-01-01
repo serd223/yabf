@@ -24,7 +24,10 @@ impl Default for Program {
 
 impl Program {
     pub fn current(&self) -> &Instruction {
-        &self.instructions[self.counter]
+        if self.len <= 0 {
+            panic!("Called .current() on Program but .len is zero.")
+        }
+        &self.instructions[self.counter.min(self.len - 1)]
     }
     pub fn step(&mut self) -> ProgramStatus {
         self.counter += 1;
