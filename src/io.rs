@@ -23,6 +23,13 @@ impl Default for BfIO {
 }
 
 impl BfIO {
+    pub fn with_source(f: fn() -> char) -> Self {
+        Self {
+            in_source: f,
+            ..Default::default()
+        }
+    }
+
     pub fn getc(&mut self) {
         self.in_buf.insert(0, (self.in_source)());
     }
@@ -42,5 +49,22 @@ impl BfIO {
 
     pub fn pop_out(&mut self) -> Option<char> {
         self.out_buf.pop()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BfIO;
+    #[test]
+    fn simple_usage() {
+        let mut io = BfIO::with_source(|| 'a');
+
+        io.getc();
+        assert_eq!(io.popc(), Some('a'));
+
+        assert_eq!(io.read_in(), 'a');
+
+        io.write_out('a');
+        assert_eq!(io.pop_out(), Some('a'));
     }
 }
