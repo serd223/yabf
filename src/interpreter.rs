@@ -1,5 +1,3 @@
-use std::io::Write;
-
 use super::{io::BfIO, Instruction, Program, ProgramStatus};
 
 /// A structure that executes the program.
@@ -85,9 +83,11 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
             }
         }
 
-        while let Some(c) = self.io_buf.pop_out() {
-            print!("{c}")
-        }
-        std::io::stdout().flush().expect("Couldn't flush stdout.");
+        self.io_buf.flush().expect("Couldn't flush output buffer.");
+
+        // while let Some(c) = self.io_buf.pop_out() {
+        //     print!("{c}")
+        // }
+        // std::io::stdout().flush().expect("Couldn't flush stdout.");
     }
 }
