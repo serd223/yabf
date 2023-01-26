@@ -3,6 +3,7 @@ pub struct BfIO {
     pub out_buf: Vec<char>,
     in_buf: Vec<char>,
     in_source: fn() -> char,
+    flush: fn(&mut BfIO) -> Result<(), ()>,
 }
 
 impl Default for BfIO {
@@ -17,6 +18,16 @@ impl Default for BfIO {
                     .expect("Couldn't read user input.");
                 let c: char = s.chars().nth(0).unwrap();
                 c
+            },
+            flush: |io| {
+                while let Some(c) = io.pop_out() {
+                    print!("{c}")
+                }
+                use std::io::Write;
+                match std::io::stdout().flush() {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(()),
+                }
             },
         }
     }
@@ -38,7 +49,12 @@ impl BfIO {
         self.in_buf.pop()
     }
 
+    pub fn flush(&mut self) -> Result<(), ()> {
+        (self.flush)(self)
+    }
+
     pub fn read_in(&mut self) -> char {
+        self.flush().expect("Couldn't flush Out Buffer");
         self.getc();
         self.popc().expect("In Buffer is empty")
     }
