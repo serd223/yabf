@@ -34,11 +34,15 @@ impl Default for BfIO {
 }
 
 impl BfIO {
-    pub fn with_source(f: fn() -> char) -> Self {
+    pub fn with_source(self, f: fn() -> char) -> Self {
         Self {
             in_source: f,
-            ..Default::default()
+            ..self
         }
+    }
+
+    pub fn with_flush(self, f: fn(&mut Self) -> Result<(), ()>) -> Self {
+        Self { flush: f, ..self }
     }
 
     pub fn getc(&mut self) {
@@ -71,16 +75,36 @@ impl BfIO {
 #[cfg(test)]
 mod tests {
     use super::BfIO;
+    static mut OUT_FLUSH: String = String::new();
     #[test]
-    fn simple_usage() {
-        let mut io = BfIO::with_source(|| 'a');
+    fn simple_io() {
+        let mut io = BfIO::default().with_source(|| 'a').with_flush(|bfio| {
+            while let Some(c) = bfio.pop_out() {
+                unsafe { OUT_FLUSH.push(c) }
+                // If BfIO's 'flush' field was a generic type that implements the FnMut trait, this unsafe mutable static usage wouldn't be necessary.
+            }
+            Ok(())
+        });
+
+        io.write_out('b');
 
         io.getc();
         assert_eq!(io.popc(), Some('a'));
-
+        unsafe {
+            assert_eq!(OUT_FLUSH, String::new());
+        }
         assert_eq!(io.read_in(), 'a');
+        unsafe {
+            assert_eq!(OUT_FLUSH, String::from('b'));
+        }
 
         io.write_out('a');
         assert_eq!(io.pop_out(), Some('a'));
+
+        io.write_out('a');
+        io.flush().unwrap();
+        unsafe {
+            assert_eq!(OUT_FLUSH, String::from("ba"));
+        }
     }
 }
