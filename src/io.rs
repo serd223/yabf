@@ -1,7 +1,7 @@
 /// A structure for organizing a BfInstance's IO operations.
 pub struct BfIO {
     pub out_buf: Vec<char>,
-    in_buf: Vec<char>,
+    pub in_buf: Vec<char>,
 }
 
 impl Default for BfIO {
