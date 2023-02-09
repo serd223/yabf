@@ -39,6 +39,6 @@ use yabf::*;
 fn main() {
     let program = Program::from(HELLO_WORLD);
     let mut bf: BfInstance<256> = BfInstance::from(program);
-    
-    bf.run();
+    let mut io = BfIO::default();
+    bf.run(&mut io);
 }

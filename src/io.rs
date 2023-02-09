@@ -1,12 +1,16 @@
 /// A structure for organizing a BfInstance's IO operations.
-pub struct BfIO {
+pub struct BfIO<SOURCE, FLUSH>
+where
+    SOURCE: FnMut() -> char,
+    FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
+{
     pub out_buf: Vec<char>,
     in_buf: Vec<char>,
-    in_source: fn() -> char,
-    flush: fn(&mut BfIO) -> Result<(), ()>,
+    in_source: SOURCE,
+    flush: FLUSH,
 }
 
-impl Default for BfIO {
+impl Default for BfIO<fn() -> char, fn(&mut Vec<char>) -> Result<(), ()>> {
     fn default() -> Self {
         Self {
             out_buf: vec![],
@@ -19,8 +23,8 @@ impl Default for BfIO {
                 let c: char = s.chars().nth(0).unwrap();
                 c
             },
-            flush: |io| {
-                while let Some(c) = io.pop_out() {
+            flush: |out| {
+                while let Some(c) = out.pop() {
                     print!("{c}")
                 }
                 use std::io::Write;
@@ -33,16 +37,18 @@ impl Default for BfIO {
     }
 }
 
-impl BfIO {
-    pub fn with_source(self, f: fn() -> char) -> Self {
+impl<SOURCE, FLUSH> BfIO<SOURCE, FLUSH>
+where
+    SOURCE: FnMut() -> char,
+    FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
+{
+    pub fn new(source: SOURCE, flush: FLUSH) -> Self {
         Self {
-            in_source: f,
-            ..self
+            in_source: source,
+            flush: flush,
+            in_buf: vec![],
+            out_buf: vec![],
         }
-    }
-
-    pub fn with_flush(self, f: fn(&mut Self) -> Result<(), ()>) -> Self {
-        Self { flush: f, ..self }
     }
 
     pub fn getc(&mut self) {
@@ -54,7 +60,7 @@ impl BfIO {
     }
 
     pub fn flush(&mut self) -> Result<(), ()> {
-        (self.flush)(self)
+        (self.flush)(&mut self.out_buf)
     }
 
     pub fn read_in(&mut self) -> char {
@@ -74,37 +80,36 @@ impl BfIO {
 
 #[cfg(test)]
 mod tests {
+    use std::cell::RefCell;
+
     use super::BfIO;
-    static mut OUT_FLUSH: String = String::new();
     #[test]
     fn simple_io() {
-        let mut io = BfIO::default().with_source(|| 'a').with_flush(|bfio| {
-            while let Some(c) = bfio.pop_out() {
-                unsafe { OUT_FLUSH.push(c) }
-                // If BfIO's 'flush' field was a generic type that implements the FnMut trait, this unsafe mutable static usage wouldn't be necessary.
-            }
-            Ok(())
-        });
+        let out_flush = RefCell::new(String::new());
+        let mut io = BfIO::new(
+            || 'a',
+            |out| {
+                while let Some(c) = out.pop() {
+                    out_flush.borrow_mut().push(c);
+                }
+                Ok(())
+            },
+        );
 
         io.write_out('b');
 
         io.getc();
         assert_eq!(io.popc(), Some('a'));
-        unsafe {
-            assert_eq!(OUT_FLUSH, String::new());
-        }
+        assert_eq!(out_flush.borrow().as_str(), "");
+
         assert_eq!(io.read_in(), 'a');
-        unsafe {
-            assert_eq!(OUT_FLUSH, String::from('b'));
-        }
+        assert_eq!(out_flush.borrow().as_str(), "b");
 
         io.write_out('a');
         assert_eq!(io.pop_out(), Some('a'));
 
         io.write_out('a');
         io.flush().unwrap();
-        unsafe {
-            assert_eq!(OUT_FLUSH, String::from("ba"));
-        }
+        assert_eq!(out_flush.borrow().as_str(), "ba");
     }
 }

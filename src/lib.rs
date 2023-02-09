@@ -1,4 +1,5 @@
 pub mod io;
+pub use io::BfIO;
 
 mod instructions;
 pub use instructions::*;
