@@ -22,7 +22,9 @@ cargo run --example hello_world
 
 ## Adding `yabf_rs` to your project
 
-`cargo add yabf_rs`
+```
+cargo add yabf_rs
+```
 
 
 ### Why `yabf_rs` instead of just `yabf`?
