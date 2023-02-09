@@ -10,7 +10,7 @@ fn main() {
 
     let program = Program::from(CODE);
     let mut bf: BfInstance<256> = BfInstance::from(program);
-    let mut io = BfIO::new(
+    bf.run(
         || input_buf.pop().unwrap(),
         |out| {
             while let Some(c) = out.pop() {
@@ -24,6 +24,5 @@ fn main() {
             }
         },
     );
-    bf.run(&mut io);
     println!("\nProgram Output: {program_output}");
 }

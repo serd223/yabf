@@ -8,6 +8,7 @@ pub struct BfInstance<const MEMSIZE: usize> {
     pub mem: [u8; MEMSIZE],
 
     pub program: Program,
+    pub io_buf: BfIO,
 }
 
 impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
@@ -16,6 +17,7 @@ impl<const MEMSIZE: usize> Default for BfInstance<MEMSIZE> {
             mem_ptr: 0,
             mem: [0; MEMSIZE],
             program: Program::default(),
+            io_buf: BfIO::default(),
         }
     }
 }
@@ -30,7 +32,7 @@ impl<const MEMSIZE: usize> From<Program> for BfInstance<MEMSIZE> {
 }
 
 impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
-    pub fn step<SOURCE, FLUSH>(&mut self, io_buf: &mut BfIO<SOURCE, FLUSH>) -> ProgramStatus
+    pub fn step<SOURCE, FLUSH>(&mut self, input_source: SOURCE, flush: FLUSH) -> ProgramStatus
     where
         SOURCE: FnMut() -> char,
         FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
@@ -52,7 +54,7 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 }
             }
             Instruction::Out => {
-                io_buf.write_out(self.mem[self.mem_ptr] as char);
+                self.io_buf.write_out(self.mem[self.mem_ptr] as char);
             }
             Instruction::In => {
                 /*
@@ -63,7 +65,7 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 let c = s.chars().nth(0).unwrap();
                 self.mem[self.mem_ptr] = c as u8;
                 */
-                self.mem[self.mem_ptr] = io_buf.read_in() as u8;
+                self.mem[self.mem_ptr] = self.io_buf.read_in(input_source, flush) as u8;
             }
             Instruction::LoopEnd(l) => {
                 if self.mem[self.mem_ptr] > 0 {
@@ -79,19 +81,21 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
         self.program.step()
     }
 
-    pub fn run<SOURCE, FLUSH>(&mut self, io_buf: &mut BfIO<SOURCE, FLUSH>)
+    pub fn run<SOURCE, FLUSH>(&mut self, mut input_source: SOURCE, mut flush: FLUSH)
     where
         SOURCE: FnMut() -> char,
         FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
     {
         loop {
-            match self.step(io_buf) {
+            match self.step(&mut input_source, &mut flush) {
                 ProgramStatus::Exit => break,
                 _ => (),
             }
         }
 
-        io_buf.flush().expect("Couldn't flush output buffer.");
+        self.io_buf
+            .flush(flush)
+            .expect("Couldn't flush output buffer.");
 
         // while let Some(c) = self.io_buf.pop_out() {
         //     print!("{c}")
