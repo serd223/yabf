@@ -11,14 +11,13 @@
 ## Basic example
 
 The following program outputs the letter 'H' to the terminal.
-```
+```rs
 use yabf_rs::*;
 fn main() {
     let program = Program::from(">++++++++[<+++++++++>-]<.");
     let mut bf: BfInstance<256> = BfInstance::from(program);
     bf.run(&mut default_input_source, &mut default_flush);
 }
-
 ```
 
 ## Running examples
