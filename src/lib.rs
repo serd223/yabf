@@ -24,11 +24,10 @@ pub fn default_flush(out: &mut Vec<char>) -> Result<(), ()> {
     }
 }
 
-pub fn default_input_source() -> char {
+pub fn default_input_source() -> Option<char> {
     let mut s = String::new();
     std::io::stdin()
         .read_line(&mut s)
         .expect("Couldn't read user input.");
-    let c: char = s.chars().nth(0).unwrap();
-    c
+    s.chars().nth(0)
 }

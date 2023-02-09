@@ -32,11 +32,16 @@ impl<const MEMSIZE: usize> From<Program> for BfInstance<MEMSIZE> {
 }
 
 impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
-    pub fn step<SOURCE, FLUSH>(&mut self, input_source: SOURCE, flush: FLUSH) -> ProgramStatus
+    pub fn step<SOURCE, FLUSH>(
+        &mut self,
+        mut input_source: SOURCE,
+        mut flush: FLUSH,
+    ) -> ProgramStatus
     where
-        SOURCE: FnMut() -> char,
+        SOURCE: FnMut() -> Option<char>,
         FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
     {
+        let mut block = false;
         match self.program.current() {
             Instruction::Add => self.mem[self.mem_ptr] += 1,
             Instruction::Sub => self.mem[self.mem_ptr] -= 1,
@@ -56,17 +61,10 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
             Instruction::Out => {
                 self.io_buf.write_out(self.mem[self.mem_ptr] as char);
             }
-            Instruction::In => {
-                /*
-                let mut s = String::new();
-                std::io::stdin().read_line(&mut s).expect(
-                    format!("Couldn't read user input @{}", self.program.counter).as_str()
-                );
-                let c = s.chars().nth(0).unwrap();
-                self.mem[self.mem_ptr] = c as u8;
-                */
-                self.mem[self.mem_ptr] = self.io_buf.read_in(input_source, flush) as u8;
-            }
+            Instruction::In => match self.io_buf.read_in(&mut input_source, &mut flush) {
+                Some(c) => self.mem[self.mem_ptr] = c as u8,
+                None => block = true,
+            },
             Instruction::LoopEnd(l) => {
                 if self.mem[self.mem_ptr] > 0 {
                     self.program.counter = *l;
@@ -78,12 +76,17 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
                 }
             }
         };
-        self.program.step()
+
+        if !block {
+            self.program.step()
+        } else {
+            ProgramStatus::Run
+        }
     }
 
     pub fn run<SOURCE, FLUSH>(&mut self, mut input_source: SOURCE, mut flush: FLUSH)
     where
-        SOURCE: FnMut() -> char,
+        SOURCE: FnMut() -> Option<char>,
         FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
     {
         loop {
@@ -96,10 +99,5 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
         self.io_buf
             .flush(flush)
             .expect("Couldn't flush output buffer.");
-
-        // while let Some(c) = self.io_buf.pop_out() {
-        //     print!("{c}")
-        // }
-        // std::io::stdout().flush().expect("Couldn't flush stdout.");
     }
 }

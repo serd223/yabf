@@ -16,9 +16,13 @@ impl Default for BfIO {
 impl BfIO {
     pub fn getc<SOURCE>(&mut self, mut input_source: SOURCE)
     where
-        SOURCE: FnMut() -> char,
+        SOURCE: FnMut() -> Option<char>,
     {
-        self.in_buf.insert(0, (input_source)());
+        let res = (input_source)();
+        match res {
+            None => return,
+            Some(c) => self.in_buf.insert(0, c),
+        }
     }
 
     pub fn popc(&mut self) -> Option<char> {
@@ -32,14 +36,14 @@ impl BfIO {
         (flush)(&mut self.out_buf)
     }
 
-    pub fn read_in<SOURCE, FLUSH>(&mut self, input_source: SOURCE, flush: FLUSH) -> char
+    pub fn read_in<SOURCE, FLUSH>(&mut self, input_source: SOURCE, flush: FLUSH) -> Option<char>
     where
-        SOURCE: FnMut() -> char,
+        SOURCE: FnMut() -> Option<char>,
         FLUSH: FnMut(&mut Vec<char>) -> Result<(), ()>,
     {
         self.flush(flush).expect("Couldn't flush Out Buffer");
         self.getc(input_source);
-        self.popc().expect("In Buffer is empty")
+        self.popc()
     }
 
     pub fn write_out(&mut self, c: char) {
@@ -58,7 +62,7 @@ mod tests {
     #[test]
     fn simple_io() {
         let mut out_flush = String::new();
-        let input_source = || 'a';
+        let input_source = || Some('a');
         let mut io = BfIO::default();
 
         io.write_out('b');
@@ -74,7 +78,7 @@ mod tests {
                 }
                 Ok(())
             }),
-            'a'
+            Some('a')
         );
         assert_eq!(out_flush.as_str(), "b");
 

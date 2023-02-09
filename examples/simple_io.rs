@@ -11,7 +11,7 @@ fn main() {
     let program = Program::from(CODE);
     let mut bf: BfInstance<256> = BfInstance::from(program);
     bf.run(
-        || input_buf.pop().unwrap(),
+        || input_buf.pop(),
         |out| {
             while let Some(c) = out.pop() {
                 print!("{c}");
