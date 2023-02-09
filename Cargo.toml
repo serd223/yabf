@@ -6,7 +6,7 @@ repository = "https://github.com/serd223/yabf"
 description = """
   A simple crate that can be used to embed Brainfuck programs into your Rust programs.
 """
-readme = "README.md"
+readme = "README.MD"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
