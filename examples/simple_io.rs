@@ -9,7 +9,7 @@ fn main() {
     let mut program_output = String::new();
 
     let program = Program::from(CODE);
-    let mut bf: BfInstance<256> = BfInstance::from(program);
+    let mut bf = BfInstance::from(program);
     bf.run(
         || input_buf.pop(),
         |out| {

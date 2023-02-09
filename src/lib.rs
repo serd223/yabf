@@ -1,5 +1,5 @@
 pub mod io;
-pub use io::BfIO;
+pub use io::*;
 
 mod instructions;
 pub use instructions::*;
@@ -31,5 +31,5 @@ pub fn default_input_source() -> Option<char> {
     std::io::stdin()
         .read_line(&mut s)
         .expect("Couldn't read user input.");
-    s.chars().nth(0)
+    s.chars().next()
 }

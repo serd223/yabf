@@ -38,6 +38,6 @@ pub const HELLO_WORLD: &str = "
 use yabf_rs::*;
 fn main() {
     let program = Program::from(HELLO_WORLD);
-    let mut bf: BfInstance<256> = BfInstance::from(program);
+    let mut bf = BfInstance::from(program);
     bf.run(&mut default_input_source, &mut default_flush);
 }

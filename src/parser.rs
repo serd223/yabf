@@ -21,7 +21,7 @@ pub fn parse<T: AsRef<str>>(code: T) -> Vec<Instruction> {
             ']' => {
                 let start = loop_starts
                     .pop()
-                    .expect(format!("Unexpected \']\' @{}", program.len()).as_str());
+                    .unwrap_or_else(|| panic!("Unexpected \']\' @{}", program.len()));
                 program[start] = Instruction::LoopStart(program.len());
                 Instruction::LoopEnd(start)
             }
@@ -29,12 +29,10 @@ pub fn parse<T: AsRef<str>>(code: T) -> Vec<Instruction> {
         };
         program.push(inst);
     }
-    if program.len() <= 0 {
-        panic!("Not valid BF program.");
+
+    if let Some(i) = loop_starts.pop() {
+        panic!("\'[\' with no matching \']\' @{i}");
     }
-    match loop_starts.pop() {
-        Some(i) => panic!("\'[\' with no matching \']\' @{i}"),
-        None => (),
-    }
+
     program
 }

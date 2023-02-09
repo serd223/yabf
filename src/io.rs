@@ -1,16 +1,8 @@
 /// A structure for organizing a BfInstance's IO operations.
+#[derive(Default)]
 pub struct BfIO {
     pub out_buf: Vec<char>,
     pub in_buf: Vec<char>,
-}
-
-impl Default for BfIO {
-    fn default() -> Self {
-        Self {
-            out_buf: vec![],
-            in_buf: vec![],
-        }
-    }
 }
 
 impl BfIO {
@@ -22,7 +14,7 @@ impl BfIO {
     {
         let res = (input_source)();
         match res {
-            None => return,
+            None => (),
             Some(c) => self.in_buf.insert(0, c),
         }
     }

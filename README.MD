@@ -1,4 +1,6 @@
 # Yet Another Brainfuck Interpreter
+[![Crate](https://img.shields.io/crates/v/yabf_rs.svg)](https://crates.io/crates/yabf_rs)
+[![API](https://docs.rs/rand/badge.svg)](https://docs.rs/yabf_rs)
 
 `yabf_rs` is a simple crate that can be used to embed Brainfuck programs into your Rust programs.
 [Documentation on docs.rs](https://docs.rs/yabf_rs/)
@@ -17,7 +19,7 @@ The following program outputs the letter 'H' to the terminal.
 use yabf_rs::*;
 fn main() {
     let program = Program::from(">++++++++[<+++++++++>-]<.");
-    let mut bf: BfInstance<256> = BfInstance::from(program);
+    let mut bf = BfInstance::from(program);
     bf.run(&mut default_input_source, &mut default_flush);
 }
 ```
@@ -36,6 +38,14 @@ git clone https://github.com/serd223/yabf
 cd yabf
 cargo run --example hello_world
 ```
+
+## Example projects written using `yabf_rs`
+
+### yabf_cli
+- [yabf_cli](https://github.com/serd223/yabf-cli) is a simple command line tool for debugging/running Brainfuck code.
+
+### yabf_gui
+- [yabf_gui](https://github.com/serd223/yabf-gui) is a proof of concept project that uses [egui](https://crates.io/crates/egui) with the [eframe](https://crates.io/crates/eframe) framework for the GUI part.
 
 ## Adding `yabf_rs` to your project
 

@@ -6,26 +6,17 @@ pub enum ProgramStatus {
 }
 
 /// A structure that contains the program logic and the program counter.
+#[derive(Default)]
 pub struct Program {
     instructions: Vec<Instruction>,
     pub counter: usize,
     len: usize,
 }
 
-impl Default for Program {
-    fn default() -> Self {
-        Self {
-            instructions: vec![],
-            counter: 0,
-            len: 0,
-        }
-    }
-}
-
 impl Program {
     /// Returns the current instruction. Panics if there are no instructions or the program counter is out of bounds.
     pub fn current(&self) -> &Instruction {
-        if self.len <= 0 {
+        if self.len == 0 {
             panic!("Called .current() on Program but .len is zero.")
         }
         &self.instructions[self.counter.min(self.len - 1)]
