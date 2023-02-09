@@ -1,4 +1,4 @@
-
+/// Enum to keep track of Brainfuck Instructions
 pub enum Instruction {
     Add,
     Sub,
@@ -6,6 +6,8 @@ pub enum Instruction {
     Right,
     Out,
     In,
+    /// Contains the index of its matching LoopEnd
     LoopStart(usize),
-    LoopEnd(usize)
+    /// Contains the index of its matching LoopStart
+    LoopEnd(usize),
 }

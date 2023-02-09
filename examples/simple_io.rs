@@ -1,4 +1,4 @@
-use yabf::*;
+use yabf_rs::*;
 
 const CODE: &str = r#"
 >+++++++++[<++++++++>-]<.,+.

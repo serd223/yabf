@@ -2,7 +2,7 @@ use crate::io::BfIO;
 
 use super::{Instruction, Program, ProgramStatus};
 
-/// A structure that executes the program.
+/// A structure that stores everything related to the program.
 pub struct BfInstance<const MEMSIZE: usize> {
     pub mem_ptr: usize,
     pub mem: [u8; MEMSIZE],
@@ -32,6 +32,8 @@ impl<const MEMSIZE: usize> From<Program> for BfInstance<MEMSIZE> {
 }
 
 impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
+    /// Executes the current instruction and increases the program counter.
+    /// If the program couldn't receive an input via `input_source`, the program counter won't increase.
     pub fn step<SOURCE, FLUSH>(
         &mut self,
         mut input_source: SOURCE,
@@ -84,6 +86,8 @@ impl<const MEMSIZE: usize> BfInstance<MEMSIZE> {
         }
     }
 
+    /// Convenience function that handles stepping/flushing for you.
+    /// Not recommended if you need to do extra operations between or during steps.
     pub fn run<SOURCE, FLUSH>(&mut self, mut input_source: SOURCE, mut flush: FLUSH)
     where
         SOURCE: FnMut() -> Option<char>,

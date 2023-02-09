@@ -13,6 +13,7 @@ use parser::*;
 mod program;
 pub use program::*;
 
+/// Default `flush` function that writes the output to regular stdout.
 pub fn default_flush(out: &mut Vec<char>) -> Result<(), ()> {
     while let Some(c) = out.pop() {
         print!("{c}")
@@ -24,6 +25,7 @@ pub fn default_flush(out: &mut Vec<char>) -> Result<(), ()> {
     }
 }
 
+/// Default `input_source` that gets its input from stdin.
 pub fn default_input_source() -> Option<char> {
     let mut s = String::new();
     std::io::stdin()

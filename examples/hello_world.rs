@@ -35,7 +35,7 @@ pub const HELLO_WORLD: &str = "
     33 >++.                    And finally a newline from Cell #6
 ";
 
-use yabf::*;
+use yabf_rs::*;
 fn main() {
     let program = Program::from(HELLO_WORLD);
     let mut bf: BfInstance<256> = BfInstance::from(program);
