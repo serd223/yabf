@@ -1,6 +1,12 @@
 [package]
 name = "yabf_rs"
 version = "0.1.0"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/serd223/yabf"
+description = """
+  A simple crate that can be used to embed Brainfuck programs into your Rust programs.
+"""
+readme = "README.md"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
