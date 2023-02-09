@@ -1,6 +1,8 @@
 # Yet Another Brainfuck Interpreter
 
 `yabf_rs` is a simple crate that can be used to embed Brainfuck programs into your Rust programs.
+[Documentation on docs.rs](https://docs.rs/yabf_rs/)
+
 
 ## Features
 
@@ -19,6 +21,10 @@ fn main() {
     bf.run(&mut default_input_source, &mut default_flush);
 }
 ```
+
+## More examples
+
+For more examples, look at the [examples](https://github.com/serd223/yabf/tree/master/examples) directory in the repository.
 
 ## Running examples
 ### Prerequisites
