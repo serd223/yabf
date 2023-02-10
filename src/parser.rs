@@ -1,7 +1,6 @@
 use super::Instruction;
 
 /// Internal function that parses a program string and produces a `Vec`tor of `Instruction`s
-/// Not meant for public use but marked as public just in case a user needs it.
 pub fn parse<T: AsRef<str>>(code: T) -> Vec<Instruction> {
     let mut program = vec![];
     let mut loop_starts = vec![];
