@@ -5,7 +5,7 @@ use super::{Instruction, Program, ProgramStatus};
 /// A structure that stores everything related to the program.
 pub struct BfInstance {
     pub mem_ptr: usize,
-    pub mem: Vec<u8>,
+    pub mem: Box<[u8]>,
 
     pub program: Program,
     pub io_buf: BfIO,
@@ -15,7 +15,7 @@ impl Default for BfInstance {
     fn default() -> Self {
         Self {
             mem_ptr: 0,
-            mem: vec![0; 256],
+            mem: Box::new([0; 256]),
             program: Program::default(),
             io_buf: BfIO::default(),
         }
